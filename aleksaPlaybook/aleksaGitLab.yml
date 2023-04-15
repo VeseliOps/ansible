@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  gather_facts: 0
+  vars_files:
+    - avault/vars/my_keys.yml
+    - roles/vars.yml
+
+  tasks:
+  - name: Creating a gitlab project
+    community.general.gitlab_project:
+      api_url: "{{ git_url }}"
+      api_token: "{{ git_api }}"
+      name: "{{ projekat_ime }}" #extra vars
+      state: present
+    tags:
+      - CR
+
+  roles:
+   - {role: roles/createGitUser, tags: ["create-user"]}
+   - {role: roles/deleteGitUser, tags: ["delete-user"]} 
+   - {role: roles/deleteGitProject, tags: ["delete-project"]} 
+   - {role: roles/updateProject, tags: ["update-project"]} 
+   - {role: roles/listAllUsers, tags: ["listAllU"]} 

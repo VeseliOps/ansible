@@ -1,0 +1,19 @@
+---
+- name: Return all users from GitLab
+  uri:
+    url: "{{ git_url }}/api/v4/users?private_token={{ git_api }}"
+    method: GET
+    return_content: yes
+    status_code: 200
+    body_format: json
+  register: result
+  
+- name: Print  error code
+  debug:
+    msg="{{ result.status }}"
+  when: result.status != 200
+- name: Print returned JSON
+  debug:
+    var: item
+  loop: "{{ result | community.general.json_query('json[*].username') }}"
+  when: result.status == 200

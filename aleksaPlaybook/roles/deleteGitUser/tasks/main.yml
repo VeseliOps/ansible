@@ -1,0 +1,8 @@
+---
+- name: "Delete GitLab User"
+  community.general.gitlab_user:
+    api_url: "{{ git_url }}"
+    api_token: "{{ git_api }}"
+    validate_certs: false
+    username: "{{ usernameGit }}" #extra var
+    state: absent
