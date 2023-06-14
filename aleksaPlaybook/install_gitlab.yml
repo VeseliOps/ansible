@@ -3,7 +3,6 @@
   gather_facts: 0
   become: 1
   vars:
-    ansible_become_password: "aleksa998"
     gitlab_ssh_key: "/etc/gitlab/ssl/gitce.key"
     gitlab_ssh_cert: "/etc/gitlab/ssl/certificate2.csr"
     gitlab_root_password: "{{ lookup('cypher', 'secret=password/veselirootpassword') }}"
