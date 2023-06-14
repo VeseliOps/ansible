@@ -1,4 +1,0 @@
----
-- name: update apt
-  apt: 
-   state: latest
