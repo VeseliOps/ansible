@@ -53,5 +53,5 @@
        state: latest
 
   roles: 
-   - {role: roles/nginx, tags: ["https"]}
+   - {role: roles/https_redirection, tags: ["https"]}
    - {role: roles/createGitUser, tags: ["user"]}
