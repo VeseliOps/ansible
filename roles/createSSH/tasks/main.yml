@@ -1,0 +1,7 @@
+---
+- name: Creating SSH key 
+  openssh_keypair:
+    path: "/home/{{ item.username }}/id_rsa"
+  with_items:
+    - {username: "{{ morpheus['customOptions']['username'] }}"}
+    - {username: "{{ morpheus['customOptions']['usernam'] }}"}

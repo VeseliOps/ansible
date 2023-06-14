@@ -1,0 +1,8 @@
+---
+- name: Create GitLab Project
+  community.general.gitlab_project:
+    validate_certs: 0
+    api_url: https://ec2-3-65-12-60.eu-central-1.compute.amazonaws.com
+    api_token: "{{ lookup('cypher', 'secret=password/veseliGitlab') }}"
+    name: "{{ morpheus['customOptions']['project_name'] }}"
+    group: "2"

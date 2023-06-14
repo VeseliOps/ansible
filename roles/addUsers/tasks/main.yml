@@ -1,0 +1,9 @@
+---
+- name: Add the user to the group
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    comment: "{{ item.comment }}"
+    groups: "{{ item.groups }}"
+  with_items:
+    - { username: "{{ morpheus['customOptions']['username'] }}", comment: 'aleksa1234', groups: 'root' } # morph variable
+    - { username: "{{ morpheus['customOptions']['usernam'] }}", comment: 'aleksa1234', groups: 'root' } # morph variable

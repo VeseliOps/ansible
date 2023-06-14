@@ -1,0 +1,46 @@
+---
+- name: Create a SSL folder 
+  file:
+    path: /etc/gitlab/ssl
+    state: directory
+  tags:
+    - folder
+
+- name: Generate private key
+  openssl_privatekey:
+    path: "{{ gitlab_ssh_key }}"
+    size: 2048
+  register: private_key
+
+- name: Generate CSR
+  openssl_csr:
+    path: "{{ gitlab_ssh_cert }}"
+    privatekey_path: "{{ gitlab_ssh_key }}"
+    common_name: "alexa"
+    country_name: "RS"
+    state_or_province_name: "Belgrade"
+    organization_name: "CT360"
+    email_address: ""
+  
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: /etc/gitlab/ssl/veselipaja.crt
+    privatekey_path: "{{ gitlab_ssh_key }}"
+    csr_path: "{{ gitlab_ssh_cert }}"
+    provider: selfsigned
+
+
+- name: Adding CSR and Key to gitlab.rb
+  become: 1
+  lineinfile:
+    path: /etc/gitlab/gitlab.rb
+    insertafter: EOF
+    line: |
+      external_url 'https://ec2-3-65-12-60.eu-central-1.compute.amazonaws.com'
+      letsencrypt['enable'] = false
+      nginx['redirect_http_to_https'] = true
+      nginx['ssl_certificate'] = "/etc/gitlab/ssl/veselipaja.crt"
+      nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitce.key"
+
+- name: Reconfigure Gitlab-CE
+  command: gitlab-ctl reconfigure

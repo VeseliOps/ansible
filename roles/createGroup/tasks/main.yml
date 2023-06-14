@@ -1,0 +1,9 @@
+---
+- name: Create GitLab Group
+  community.general.gitlab_group:
+    api_url: https://ec2-3-65-12-60.eu-central-1.compute.amazonaws.com
+    validate_certs: 0
+    api_token: "{{ lookup('cypher', 'password/veseliGitlab') }}"
+    name: veseli2
+    path: veseli
+    state: present

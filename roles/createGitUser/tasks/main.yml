@@ -1,0 +1,25 @@
+---
+- name: Get oauth token 
+  uri:
+    url: https://ec2-3-65-12-60.eu-central-1.compute.amazonaws.com/oauth/token?grant_type=password&username=root&password={{ gitlab_root_password }}
+    method: POST
+    return_content: 1
+    status_code: 200
+    body_format: json
+    validate_certs: 0
+  register: token
+
+- name: create a user
+  uri:
+    url: https://ec2-3-65-12-60.eu-central-1.compute.amazonaws.com/api/v4/users
+    method: POST
+    headers: 
+      Authorization: "Bearer {{token.json.access_token}}"
+    body_format: json
+    body:
+      email: "{{ morpheus['customOptions']['gitlab_email'] }}"
+      username: "{{ morpheus['customOptions']['gitlab_username'] }}"
+      name: "{{ morpheus['customOptions']['gitlab_fullname'] }}"
+      password: "{{ morpheus['customOptions']['gitlab_password'] }}"
+    status_code: 201, 409 # 201 is created, 409 is already exists
+    validate_certs: 0
