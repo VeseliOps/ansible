@@ -1,0 +1,57 @@
+---
+- hosts: all
+  gather_facts: 0
+  become: 1
+  vars:
+    ansible_become_password: "aleksa998"
+    gitlab_ssh_key: "/etc/gitlab/ssl/gitce.key"
+    gitlab_ssh_cert: "/etc/gitlab/ssl/certificate2.csr"
+    gitlab_root_password: "{{ lookup('cypher', 'secret=password/veselirootpassword') }}"
+
+  pre_tasks:
+   - name: Install prereq
+     package:
+       name: "{{ item }}"
+       state: latest
+     with_items:
+       - curl
+       - openssh-server
+       - ca-certificates
+
+   - name: Check if GitLab-CE is already installed
+     stat:
+       path: /etc/gitlab
+     register: gitlab
+
+   - name: Download GitLab-CE Deb script
+     get_url:
+       url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh
+       dest: /tmp/gitlab-ce.deb.sh
+     when: not gitlab.stat.exists
+
+   - name: Execute GitLab-CE Deb script
+     command: /bin/bash /tmp/gitlab-ce.deb.sh
+     when: not gitlab.stat.exists
+
+   - name: Install GitLab Community Edition
+     package:
+       name: gitlab-ce
+       state: latest
+   
+   - name: Change the root password
+     command: sudo gitlab-rails runner "user = User.find_by_username 'root'; user.password = '{{gitlab_root_password}}'; user.password_confirmation = '{{gitlab_root_password}}'; user.save!"
+
+   - name: Configure GitLab Community Edition
+     command: gitlab-ctl reconfigure
+   
+   - name: Install pip
+     apt: name=pip state=latest
+
+   - name: Install pyton-gitlab    
+     pip:
+       name: python-gitlab
+       state: latest
+
+  roles: 
+   - {role: roles/nginx, tags: ["https"]}
+   - {role: roles/createGitUser, tags: ["user"]}
